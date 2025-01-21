@@ -37,10 +37,29 @@ app.post("/submit", (req, res) => {
 // Route to handle dynamic form rendering based on flow
 app.post("/dynamicpe/flow", (req, res) => {
   const selectedFlow = req.query.flow;
+
   const { notes, callbackUrl } = req.body;
 
   if (selectedFlow === "unsubscribe") {
-    return res.send("<h3>Unsubscribe functionality coming soon!</h3>");
+    const formData = generateRecord();
+
+    try {
+      const redirectUrl = new URL(callbackUrl);
+
+      Object.entries(formData).forEach(([key, value]) => {
+        redirectUrl.searchParams.append(key, value);
+      });
+
+      if (req.body.notes) {
+        redirectUrl.searchParams.append("notes", req.body.notes);
+      }
+
+      // Redirect to the constructed URL
+      res.redirect(redirectUrl.toString());
+    } catch (error) {
+      res.status(400).send("Invalid callback URL.");
+    }
+    return;
   }
 
   res.send(`
@@ -123,6 +142,4 @@ app.post("/dynamicpe/flow", (req, res) => {
 // Start the server
 const port = process.env.PORT || 5600;
 
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
-});
+app.listen(port, () => {});
