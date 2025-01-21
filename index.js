@@ -1,10 +1,15 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const { generateRecord } = require("./utils.js");
+const generateRecord = require("./utils.js");
+const path = require("path");
 
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true })); // Parse form submissions
+
+app.get("/", (req, res) => {
+  return res.sendFile(path.join(__dirname, "/index.html"));
+});
 
 // Route to serve the form submission logic
 app.post("/submit", (req, res) => {
@@ -116,7 +121,8 @@ app.post("/dynamicpe/flow", (req, res) => {
 });
 
 // Start the server
-const PORT = 5600;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+const port = process.env.PORT || 5600;
+
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
 });
